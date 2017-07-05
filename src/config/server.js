@@ -34,6 +34,7 @@ router.post('/mailer', function (req, res) {
 function sendMail(req, res) {
   var mailer = new Mailer()
   var receivers = [];
+  var returnID;
 
   mailer.name = req.body.name
   mailer.email = req.body.email
@@ -50,6 +51,7 @@ function sendMail(req, res) {
     if (error)
       res.send(error)
 
+    returnID = mailer.id
   })
 
   var transporter = nodemailer.createTransport({
@@ -59,7 +61,6 @@ function sendMail(req, res) {
       pass: 'desafiofhinck123'
     }
   })
-
 
   Object.keys(mailer._doc.tasks).forEach(function (key) {
     switch (key) {
@@ -91,11 +92,22 @@ function sendMail(req, res) {
 
   receivers.push(mailer.email)
 
+  var selfieName;
+  var shipName;
+
+  var tmpSelfieName = req.files[0].mimetype.split('/')
+  var tmpShipName = req.files[1].mimetype.split('/')
+
+  selfieName = 'selfie.' + tmpSelfieName[1]
+  shipName = 'ship.' + tmpShipName[1]
+
   var mailOptions = {
     from: 'nickdesafiofhinck@gmail.com',
     to: receivers,
     subject: 'Formulário de Autorização',
     text: `
+    Informações sobre o piloto que deseja atracar na base
+
       Nome do Piloto: ${mailer.name}
       Email: ${mailer.email}
       Planeta: ${mailer.planet}
@@ -109,11 +121,11 @@ function sendMail(req, res) {
     `,
     attachments: [
       {
-        filename: 'selfie',
+        filename: selfieName,
         content: req.files[0].buffer
       },
       {
-        filename: 'ship',
+        filename: shipName,
         content: req.files[1].buffer
       }
     ]
@@ -124,8 +136,8 @@ function sendMail(req, res) {
       res.send(error)
     } else {
       res.json({
-        message: "enviou o email",
-        requestID: ''
+        message: "Email Sent",
+        requestID: returnID
       })
 
     }
