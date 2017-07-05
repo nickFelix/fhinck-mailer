@@ -1,3 +1,4 @@
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
-module.exports = mongoose.connect('mongodb://localhost/mailer')
+
+mongoose.connect('mongodb://nickfhinck:fhinck123@ds147902.mlab.com:47902/desafio-fhinck')
